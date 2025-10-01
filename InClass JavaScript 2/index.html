@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Final Grade Calculator</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="card" role="main">
+<h1>Final Grade Calculator</h1>
+<p class="lead">Enter the student's scores (0–100). Weights are built in: Test1 25%, Test2 30%, P1 1%, P2 4%, P3 15%, Assignments 25%.</p>
+
+
+<form id="gradeForm">
+<div class="grid">
+<div>
+<label for="studentName">Student name</label>
+<input id="studentName" type="text" placeholder="e.g. Jane Doe" />
+</div>
+
+
+<div>
+<label for="test1">Test 1 (25%)</label>
+<input id="test1" type="number" min="0" max="100" step="0.1" placeholder="0 - 100" />
+</div>
+
+
+<div>
+<label for="test2">Test 2 (30%)</label>
+<input id="test2" type="number" min="0" max="100" step="0.1" placeholder="0 - 100" />
+</div>
+
+
+<div>
+<label for="p1">Project 1 (1%)</label>
+<input id="p1" type="number" min="0" max="100" step="0.1" placeholder="0 - 100" />
+</div>
+
+
+<div>
+<label for="p2">Project 2 (4%)</label>
+<input id="p2" type="number" min="0" max="100" step="0.1" placeholder="0 - 100" />
+</div>
+
+
+<div>
+<label for="p3">Project 3 (15%)</label>
+<input id="p3" type="number" min="0" max="100" step="0.1" placeholder="0 - 100" />
+</div>
+
+
+<div class="full">
+<label for="assign">Assignment Score (25%)</label>
+<input id="assign" type="number" min="0" max="100" step="0.1" placeholder="0 - 100" />
+</div>
+</div>
+
+
+<div class="btn-row">
+<button type="button" class="btn-primary" id="calcBtn">Calculate</button>
+<button type="button" class="btn-ghost" id="resetBtn">Reset</button>
+</div>
+
+
+<div class="result" id="result" aria-live="polite" style="display:none">
+<h2 id="outName">Results</h2>
+<div class="small">Final Percentage: <strong id="percentOut"></strong></div>
+<div class="small">Letter Grade: <strong id="letterOut"></strong></div>
+<div class="small">GPA (out of 4.0): <strong id="gpaOut"></strong></div>
+<footer>Rounding: percentage shown rounded to one decimal place. Letter mapping uses the scale you provided.</footer>
+</div>
+</form>
+</main>
+<script src="script.js"></script>
+</body>
+</html>

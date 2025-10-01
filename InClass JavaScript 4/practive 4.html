@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Score Averager</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    input {
+      padding: 10px;
+      width: 80%;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 5px;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #45a049;
+    }
+
+    .scores, .average {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+
+    .score-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 10px 0;
+    }
+
+    .score-list li {
+      background: #f2f2f2;
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Score Averager</h1>
+    <input type="number" id="scoreInput" placeholder="Enter a score" />
+    <br>
+    <button onclick="addScore()">Add Score</button>
+    <button onclick="finish()">Finish</button>
+
+    <div class="scores">
+      <h3>Scores Entered:</h3>
+      <ul id="scoreList" class="score-list"></ul>
+    </div>
+
+    <div id="averageResult" class="average"></div>
+  </div>
+
+  <script>
+    let scores = [];
+
+    function addScore() {
+      const input = document.getElementById("scoreInput");
+      const score = parseFloat(input.value);
+
+      if (!isNaN(score)) {
+        scores.push(score);
+
+        // Display score
+        const list = document.getElementById("scoreList");
+        const li = document.createElement("li");
+        li.textContent = score;
+        list.appendChild(li);
+
+        input.value = "";
+        input.focus();
+      } else {
+        alert("Please enter a valid number.");
+      }
+    }
+
+    function finish() {
+      if (scores.length === 0) {
+        alert("Please enter at least one score.");
+        return;
+      }
+
+      const sum = scores.reduce((a, b) => a + b, 0);
+      const avg = (sum / scores.length).toFixed(2);
+
+      document.getElementById("averageResult").innerHTML = 
+        `<strong>Average Score: ${avg}</strong>`;
+    }
+  </script>
+</body>
+</html>
