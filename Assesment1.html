@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Individual Assignment 1 - Olympic Medal Earnings</title>
+
+  <!-- I wanted to make the page visually appealing so I had AI create this style for me. -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0d1b2a, #1b263b);
+      color: #f8f9fa;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    button {
+      background-color: #0077b6;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    button:hover {
+      background-color: #00b4d8;
+      transform: scale(1.05);
+    }
+
+    p {
+      margin-top: 30px;
+      font-size: 1.1rem;
+      line-height: 1.8;
+    }
+  </style>
+
+  <script>
+    // This function ensures that the user inputs a valid integer. I made it as a little extra usability.
+    function getValidInteger(promptMessage) {
+        let value;
+        // Fancy do-while loop.
+        do {
+            // This gets the input and changes it to an integer.
+            let input = prompt(promptMessage);
+            if (input === null) {
+                return null; // User pressed cancel otherwise it's a ''
+            }
+            value = parseInt(input);
+        } while (isNaN(value) || value < 0); //Checks to see if it's a number and not negative.
+        return value;
+    }
+    // This is the main function that runs after the button is pushed.
+    function goForTheGold() {
+
+        let numAthletes = getValidInteger("How many athletes?"); // Using the custom function described above.
+        if (isNaN(numAthletes) || numAthletes <= 0) {
+            alert("No athletes to process. Exiting program.");
+            return;
+        }
+
+        // Initialize arrays to store athlete data.
+        let athleteNames = [];
+        let totalMonetary = [];
+        let monetaryMessage = [];
+
+        // Beginning of getting user input.
+        for (let i = 0; i < numAthletes; i++) {
+            // Gets the athlete's name then pushes it to the array.
+            let name = prompt("Enter Athlete " + (i + 1) + "'s name:");
+            athleteNames.push(name);
+
+            // Gets the number of medals using the custom function.
+            let gold = getValidInteger("Enter " + name + "'s number of Gold Medals:");
+            if (gold === null) return;
+
+            let silver = getValidInteger("Enter " + name + "'s number of Silver Medals:");
+            if (silver === null) return;
+
+            let bronze = getValidInteger("Enter " + name + "'s number of Bronze Medals:");
+            if (bronze === null) return;
+
+            // Calculate total monetary value based on the amount of each medal.
+            let total = (gold * 37500) + (silver * 22500) + (bronze * 15000);
+            totalMonetary.push(total);
+
+            // Determine the message based on total.
+            let message = "";
+            if (total >= 500000) {
+                message = "Become a sports commentator";
+            } else if (total >= 250000) {
+                message = "You are rich and famous";
+            } else {
+                message = "Great job! Keep training!";
+            }
+            // Push the message to the array.
+            monetaryMessage.push(message);
+        }
+
+        // Sort athletes by total monetary value in descending order using a simple bubble sort.
+        for (let i = 0; i < numAthletes - 1; i++) {
+            // after getting the first value it then grabs the second value to compare it to the first.
+            for (let j = i + 1; j < numAthletes; j++) {
+                // Checks if the first value is less than the second value. If not then it goes to the next value.
+                if (totalMonetary[i] < totalMonetary[j]) {
+                    // Swaps the values in all three arrays to keep data consistent.
+                    let tempMonetary = totalMonetary[i];
+                    totalMonetary[i] = totalMonetary[j];
+                    totalMonetary[j] = tempMonetary;
+
+                    let tempName = athleteNames[i];
+                    athleteNames[i] = athleteNames[j];
+                    athleteNames[j] = tempName;
+
+                    let tempMsg = monetaryMessage[i];
+                    monetaryMessage[i] = monetaryMessage[j];
+                    monetaryMessage[j] = tempMsg;
+                }
+            }
+        }
+
+        // Generate the output string. and formats it correctly for the body text.
+        let output = "";
+        for (let i = 0; i < numAthletes; i++) {
+            output += `<strong>${athleteNames[i]}</strong> — $${totalMonetary[i].toLocaleString()} — ${monetaryMessage[i]}<br>`;
+        }
+
+        // Display the output in the HTML page.
+        document.getElementById("olympicOutput").innerHTML = output;
+    }
+  </script>
+</head>
+
+<body>
+    <!-- This is the button that runs "goForTheGold()" function -->
+    <button type="button" onclick="goForTheGold()">🏅 Go For The Gold 🏅</button>
+    <!-- This is the output section -->
+    <p id="olympicOutput"></p>
+</body>
+</html>
