@@ -1,0 +1,277 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokemon Battle Game</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #d0f0ff, #f5f9ff);
+      text-align: center;
+      margin: 0;
+      padding: 40px;
+      color: #222;
+    }
+
+    h1 {
+      color: #2a75bb;
+      text-shadow: 1px 1px 2px #ccc;
+    }
+
+    #gameArea {
+      display: none;
+      margin-top: 30px;
+    }
+
+    /* Layout for Pokémon display */
+    .pokemon-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 60px;
+      margin-bottom: 20px;
+    }
+
+    .pokemon {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: white;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+      width: 180px;
+    }
+
+    label {
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+
+    img {
+      width: 120px;
+      height: 120px;
+      border-radius: 10px;
+      border: 2px solid #ccc;
+      background-color: #f8f8f8;
+    }
+
+    #playButton {
+      display: none;
+      padding: 12px 30px;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 10px;
+      background-color: #ffcb05;
+      color: #2a75bb;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 3px #2a75bb;
+    }
+
+    #playButton:hover {
+      background-color: #ffdf3c;
+      transform: scale(1.05);
+    }
+
+    #winnerLabel {
+      display: none;
+      margin-top: 20px;
+      font-size: 1.2rem;
+      color: #333;
+      font-weight: bold;
+    }
+
+    #gameHistory {
+      margin-top: 30px;
+      white-space: pre-line;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <h1>Pokémon Battle Game</h1>
+
+  <!-- Main Game Area -->
+  <div id="gameArea">
+    <div class="pokemon-container">
+      <div class="pokemon">
+        <label id="pokemon1"></label>
+        <img id="pokemonImage1" src="" alt="Pokemon 1">
+      </div>
+
+      <div class="pokemon">
+        <label id="pokemon2"></label>
+        <img id="pokemonImage2" src="" alt="Pokemon 2">
+      </div>
+    </div>
+
+    <button id="playButton">Play</button>
+    <label id="winnerLabel"></label>
+  </div>
+
+  <!-- Game History -->
+  <p id="gameHistory"></p>
+
+  <script>
+    // --- Pokémon Arrays ---
+    const asPokemon1 = ["Pikachu", "Eevee", "Snorlax"];
+    const asPokemon2 = ["Garchomp", "Lucario", "Ditto"];
+
+    // --- Corresponding image filenames ---
+    const pokemonImages = {
+      Pikachu: "pikachu.jpg",
+      Eevee: "eevee.jpg",
+      Snorlax: "snorlax.jpg",
+      Garchomp: "garchomp.jpg",
+      Lucario: "lucario.jpg",
+      Ditto: "ditto.jpg"
+    };
+
+    // --- Game State Variables ---
+    let team1Index = 0;
+    let team2Index = 0;
+    let team1Losses = 0;
+    let team2Losses = 0;
+    let team1Wins = 0;
+    let team2Wins = 0;
+    let gameHistoryArray = [];
+
+    // --- DOM Elements ---
+    const gameArea = document.getElementById("gameArea");
+    const pokemon1Label = document.getElementById("pokemon1");
+    const pokemon2Label = document.getElementById("pokemon2");
+    const pokemonImage1 = document.getElementById("pokemonImage1");
+    const pokemonImage2 = document.getElementById("pokemonImage2");
+    const playButton = document.getElementById("playButton");
+    const winnerLabel = document.getElementById("winnerLabel");
+    const gameHistory = document.getElementById("gameHistory");
+
+    // --- Ask user to play ---
+    function askToPlay() {
+      let response = prompt("Do you want to play?");
+      if (response && response[0].toLowerCase() === "y") {
+        startGame();
+      } else {
+        gameHistory.textContent = "Maybe next time! Thanks for visiting.";
+      }
+    }
+
+    // --- Initialize or restart the game ---
+    function startGame() {
+      team1Index = 0;
+      team2Index = 0;
+      team1Losses = 0;
+      team2Losses = 0;
+      team1Wins = 0;
+      team2Wins = 0;
+      winnerLabel.textContent = "";
+      gameArea.style.display = "block";
+
+      pokemon1Label.style.display = "block";
+      pokemon2Label.style.display = "block";
+      pokemonImage1.style.display = "block";
+      pokemonImage2.style.display = "block";
+      playButton.style.display = "inline-block";
+      winnerLabel.style.display = "block";
+
+      updateDisplay();
+    }
+
+    // --- Update Pokémon info ---
+    function updateDisplay() {
+      pokemon1Label.textContent = asPokemon1[team1Index];
+      pokemon2Label.textContent = asPokemon2[team2Index];
+      pokemonImage1.src = pokemonImages[asPokemon1[team1Index]];
+      pokemonImage2.src = pokemonImages[asPokemon2[team2Index]];
+    }
+
+    // --- Play a round ---
+    function playRound() {
+      const p1 = asPokemon1[team1Index];
+      const p2 = asPokemon2[team2Index];
+      const p1Num = Math.floor(Math.random() * 21);
+      const p2Num = Math.floor(Math.random() * 21);
+
+      // Record round
+      const roundResult = `${p1} ${p1Num} – ${p2} ${p2Num}`;
+      gameHistoryArray.push(roundResult);
+
+      // Determine winner
+      let roundText = "";
+      if (p1Num > p2Num) {
+        team1Wins++;
+        team2Losses++;
+        roundText = `${p1} wins this round!`;
+      } else if (p2Num > p1Num) {
+        team2Wins++;
+        team1Losses++;
+        roundText = `${p2} wins this round!`;
+      } else {
+        roundText = "It's a tie!";
+      }
+
+      winnerLabel.textContent = roundText;
+
+      // Knockout check AFTER showing result
+      let knockedOut = false;
+      if (team1Losses >= 3) {
+        winnerLabel.textContent += ` ${p1} is out!`;
+        team1Index++;
+        team1Losses = 0;
+        knockedOut = true;
+      }
+      if (team2Losses >= 3) {
+        winnerLabel.textContent += ` ${p2} is out!`;
+        team2Index++;
+        team2Losses = 0;
+        knockedOut = true;
+      }
+
+      // If that was the last battle, show result first, then end game after short delay
+      if (team1Index >= asPokemon1.length || team2Index >= asPokemon2.length) {
+        setTimeout(endGame, 100);
+      } else if (knockedOut) {
+        setTimeout(updateDisplay, 100);
+      }
+    }
+
+    // --- End Game ---
+    function endGame() {
+      playButton.style.display = "none";
+
+      let winnerText = "";
+      if (team1Wins > team2Wins) {
+        winnerText = "🏆 Team 1 Wins the Game!";
+      } else if (team2Wins > team1Wins) {
+        winnerText = "🏆 Team 2 Wins the Game!";
+      } else {
+        winnerText = "It's a draw!";
+      }
+      winnerLabel.textContent = winnerText;
+
+      let replay = prompt("Do you want to play again?");
+      if (replay && replay[0].toLowerCase() === "y") {
+        startGame();
+      } else {
+        displayGameHistory();
+      }
+    }
+
+    // --- Display full game history ---
+    function displayGameHistory() {
+      gameArea.style.display = "none";
+      gameHistory.innerHTML = "<strong>GAME HISTORY:</strong><br>" + gameHistoryArray.join("<br>");
+    }
+
+    // --- Event Listeners ---
+    playButton.addEventListener("click", playRound);
+
+    // --- Start program ---
+    askToPlay();
+  </script>
+</body>
+</html>

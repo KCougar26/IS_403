@@ -1,0 +1,159 @@
+<!-- 
+ Date: 2025-10-25
+ Name: Allen Schultz
+ NetID: allenrs
+ Description: Page to view and manipulate members in the array
+ -->
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>View Members</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #fef6e4;
+    text-align: center;
+    padding: 40px;
+  }
+  h2 {
+    color: #d97b2b;
+  }
+  input {
+    padding: 6px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin: 5px;
+  }
+  button {
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    margin: 5px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .showBtn {
+    background-color: #d97b2b;
+  }
+  .moveBtns button {
+    background-color: #b86a1b;
+  }
+  .moveBtns button:hover, .showBtn:hover {
+    opacity: 0.85;
+  }
+  .homeBtn {
+    background-color: #7c6f6f;
+  }
+  .sortLabel {
+    color: #d97b2b;
+    font-weight: bold;
+    margin-top: 10px;
+    display: block;
+  }
+</style>
+</head>
+<body>
+
+<h2>Member List</h2>
+
+<div>
+  <input type="text" id="fname_as_8547" placeholder="First Name">
+  <input type="text" id="lname_as_8547" placeholder="Last Name">
+</div>
+
+<div>
+  <button class="showBtn" onclick="showMembers_as_8547()">Show Members</button>
+</div>
+
+<span class="sortLabel">Sort / Move Options</span>
+
+<div class="moveBtns">
+  <button onclick="addEnd_as_8547()">Add End</button>
+  <button onclick="addFront_as_8547()">Add Front</button>
+</div>
+
+<div class="moveBtns">
+  <button onclick="removeFirst_as_8547()">Remove First</button>
+  <button onclick="removeLast_as_8547()">Remove Last</button>
+</div>
+
+<div>
+  <button class="homeBtn" onclick="goHome_as_8547()">Go Home</button>
+</div>
+<br>
+
+<div id="output_as_8547"></div>
+
+<script>
+// SID = 8547 → 8+5+4+7=24 → 24×7=168 → 168%1000=168 → PIN = 168
+let members = JSON.parse(localStorage.getItem("members")) || [];
+
+function showMembers_as_8547() {
+    let out = document.getElementById("output_as_8547");
+    if (members.length === 0) {
+        out.innerHTML = "<p>No members found.</p>";
+    }
+
+    let output = ""; // start with empty string
+
+    for (let m of members) {
+        output += `Name: ${m.fname}
+        ${m.lname},
+        Age: ${m.age},
+        Breakfast: ${m.breakfast},
+        Newsletter: ${m.newsletter ? "Yes" : "No"} <br><br>`;
+    }
+
+    out.innerHTML = output;
+}
+
+function addEnd_as_8547() {
+    moveMember_as_8547(false);
+}
+
+function addFront_as_8547() {
+    moveMember_as_8547(true);
+}
+
+function moveMember_as_8547(toFront) {
+    let fname = document.getElementById("fname_as_8547").value.trim();
+    let lname = document.getElementById("lname_as_8547").value.trim();
+    if (!fname || !lname) 
+        return alert("Enter both first and last name to locate the member.");
+
+    let idx = members.findIndex(m => m.fname === fname && m.lname === lname);
+    if (idx === -1) 
+        return alert("Member not found.");
+
+    let member = members.splice(idx, 1)[0];
+    if (toFront) 
+        members.unshift(member);
+    else 
+        members.push(member);
+
+    localStorage.setItem("members", JSON.stringify(members));
+    showMembers_as_8547();
+}
+
+function removeFirst_as_8547() {
+    if (members.length === 0) return;
+        members.shift();
+        localStorage.setItem("members", JSON.stringify(members));
+        showMembers_as_8547();
+}
+
+function removeLast_as_8547() {
+    if (members.length === 0) return;
+    members.pop();
+    localStorage.setItem("members", JSON.stringify(members));
+    showMembers_as_8547();
+}
+
+function goHome_as_8547() {
+    window.location = "index.html";
+}
+</script>
+</body>
+</html>

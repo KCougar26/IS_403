@@ -1,0 +1,181 @@
+<!-- 
+ Date: 2025-10-25
+ Name: Allen Schultz
+ NetID: allenrs
+ Description: Page to add new members to the array
+ -->
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Add Member</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #fef6e4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 30px;
+  }
+  h2 {
+    color: #d97b2b;
+  }
+  form {
+    background-color: #fff6ea;
+    padding: 20px 40px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #d6c5b3;
+    width: 320px;
+  }
+  label {
+    display: block;
+    margin-top: 10px;
+    text-align: left;
+  }
+  input, select {
+    width: 100%;
+    padding: 6px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  .checkbox-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+  }
+  input[type="checkbox"] {
+    transform: scale(1.6);
+    margin-left: 10px;
+  }
+  .error {
+    color: red;
+    font-size: 12px;
+    margin: 2px 0 0 0;
+  }
+  button {
+    background-color: #d97b2b;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    margin: 8px 6px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #c46b24;
+  }
+  #msg_as_8547 {
+    margin-top: 10px;
+    color: #3b2f2f;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<h2>Add a New Member</h2>
+
+<form id="form_as_8547">
+  <label>First Name:
+    <input type="text" id="fname_as_8547">
+    <p id="errF_as_8547" class="error"></p>
+  </label>
+
+  <label>Last Name:
+    <input type="text" id="lname_as_8547">
+    <p id="errL_as_8547" class="error"></p>
+  </label>
+
+  <label>Age:
+    <input type="number" id="age_as_8547" min="1" max="120">
+    <p id="errA_as_8547" class="error"></p>
+  </label>
+
+  <label>Favorite Breakfast:
+    <select id="breakfast_as_8547">
+      <option value="">--Select--</option>
+      <option>Bacon</option>
+      <option>Eggs</option>
+      <option>Pancakes</option>
+      <option>Cereal</option>
+      <option>Protein Drink</option>
+      <option>Other</option>
+    </select>
+    <p id="errB_as_8547" class="error"></p>
+  </label>
+
+  <div class="checkbox-container">
+    <label>Subscribe to Newsletter</label>
+    <input type="checkbox" id="newsletter_as_8547">
+  </div>
+
+  <div style="text-align:center;">
+    <button type="button" onclick="addmember_as_8547()">Add Member</button>
+    <button type="button" onclick="clearForm_as_8547()">Clear Form</button>
+    <button type="button" onclick="homeBtn_as_8547()">Back to Home</button>
+  </div>
+
+  <p id="msg_as_8547"></p>
+</form>
+
+<script>
+// SID = 8547 → 8+5+4+7=24 → 24×7=168 → 168%1000=168 → PIN = 168
+
+// This grabs the existing members from localStorage
+let members = JSON.parse(localStorage.getItem("members")) || [];
+
+function addmember_as_8547() {
+
+    let fname = document.getElementById("fname_as_8547").value.trim();
+    let lname = document.getElementById("lname_as_8547").value.trim();
+    let age = document.getElementById("age_as_8547").value;
+    let breakfast = document.getElementById("breakfast_as_8547").value;
+    let newsletter = document.getElementById("newsletter_as_8547").checked;
+
+    let valid = true;
+
+    // Reset errors
+    document.getElementById("errF_as_8547").innerText = "";
+    document.getElementById("errL_as_8547").innerText = "";
+    document.getElementById("errA_as_8547").innerText = "";
+    document.getElementById("errB_as_8547").innerText = "";
+
+    if (!fname) {
+        document.getElementById("errF_as_8547").innerText = "First name is required.";
+        valid = false;
+    }
+    if (!lname) {
+        document.getElementById("errL_as_8547").innerText = "Last name is required.";
+        valid = false;
+    }
+    if (!age || age < 1 || age > 120) {
+        document.getElementById("errA_as_8547").innerText = "Age must be between 1 and 120.";
+        valid = false;
+    }
+    if (!breakfast) {
+        document.getElementById("errB_as_8547").innerText = "Please select a breakfast option.";
+        valid = false;
+    }
+
+    if (!valid) return;
+        let newMember = { fname, lname, age, breakfast, newsletter };
+        members.push(newMember);
+        localStorage.setItem("members", JSON.stringify(members));
+
+    document.getElementById("msg_as_8547").innerText = "Member added successfully!";
+    clearForm_as_8547();
+}
+
+function clearForm_as_8547() {
+    document.getElementById("form_as_8547").reset();
+}
+
+function homeBtn_as_8547() {
+    window.location = "index.html";
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<%- include("layout", { body: `
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2>Competitions</h2>
+  <a href="/competitions/add" class="btn btn-success">+ Add Competition</a>
+</div>
+
+<table class="table table-striped shadow-sm">
+  <thead class="table-dark">
+    <tr>
+      <th>ID</th>
+      <th>Organizer ID</th>
+      <th>Location</th>
+      <th>Sanctioned</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    ${competitions.map(c => `
+    <tr>
+      <td>${c.Competition_ID}</td>
+      <td>${c.Organizer_ID || '-'}</td>
+      <td>${c.Location}</td>
+      <td>${c.Sanctioned ? '✅' : '❌'}</td>
+      <td>
+        <a href="/competitions/edit/${c.Competition_ID}" class="btn btn-sm btn-warning">Edit</a>
+        <a href="/competitions/delete/${c.Competition_ID}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this competition?')">Delete</a>
+      </td>
+    </tr>`).join('')}
+  </tbody>
+</table>
+` }) %>

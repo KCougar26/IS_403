@@ -1,0 +1,75 @@
+<!-- 
+ Date: 2025-10-25
+ Name: Allen Schultz
+ NetID: allenrs
+ Description: Landing page for Club Member Manager
+ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Club Member Manager</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #fef6e4;
+    text-align: center;
+    padding: 50px;
+    color: #3b2f2f;
+  }
+  h1 {
+    color: #d97b2b;
+  }
+  button {
+    background-color: #d97b2b;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  button:hover {
+    background-color: #c46b24;
+  }
+  #info {
+    margin-top: 40px;
+    font-size: 14px;
+    color: #5a4646;
+  }
+</style>
+</head>
+<body>
+
+<h1>Club Member Manager</h1>
+<p>Welcome to the Club Member Manager! Use this tool to add and manage club members easily.</p>
+
+<button onclick="goToAdd_as_8547()">Add Member</button>
+<button onclick="goToList_as_8547()">View Members</button>
+
+<p id="info"></p>
+
+<script>
+// SID = 8547 → 8+5+4+7=24 → 24×7=168 → 168%1000=168 → PIN = 168
+let members = JSON.parse(localStorage.getItem("members")) || [];
+
+// Go to add page
+function goToAdd_as_8547() {
+    window.location = "add.html";
+}
+
+// Go to list page
+function goToList_as_8547() {
+    window.location = "list.html";
+}
+
+// This persists student info across pages
+document.getElementById("info").innerText = "Student: Allen Schultz | SID: 8547 | PIN: 168";
+if (!localStorage.getItem("members")) {
+    localStorage.setItem("members", JSON.stringify([]));
+}
+
+</script>
+</body>
+</html>

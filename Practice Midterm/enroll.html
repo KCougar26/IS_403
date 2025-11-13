@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Enroll - Two-Page Club Roster</title>
+
+  <!-- Bootstrap for layout (still allowed) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    /* ---------- COLOR SCHEME ---------- */
+    body {
+      background-color: #f2e6d8;  /* warm beige */
+      padding: 2.5rem;
+      font-family: "Segoe UI", sans-serif;
+    }
+    .container-card {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #fff2e0;        /* soft cream tone */
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+      padding: 2rem;
+    }
+
+    /* ---------- MESSAGES ---------- */
+    #msg.ok {
+      color: #1f5133;
+      background: #c7ecd6;
+      padding: .5rem;
+      border-radius: .25rem;
+    }
+    #msg.err {
+      color: #642626;
+      background: #f5c8c8;
+      padding: .5rem;
+      border-radius: .25rem;
+    }
+
+    /* ---------- FORM ---------- */
+    label.small { font-weight:600; }
+    .error-text {
+      color: #b33a3a;
+      font-size: 0.9em;
+      margin-top: 0.25rem;
+    }
+
+    /* ---------- BUTTONS ---------- */
+    .actions > button {
+      margin-right: .5rem;
+      margin-top: .5rem;
+      border: none;
+    }
+    #addBtn, #frontBtn {
+      background-color: #d2691e;
+      color: #fff;
+    }
+    #addBtn:hover, #frontBtn:hover {
+      background-color: #b55417;
+    }
+    #undoBtn, #removeFirstBtn {
+      background-color: #c97c5d;
+      color: #fff;
+    }
+    #undoBtn:hover, #removeFirstBtn:hover {
+      background-color: #b26c50;
+    }
+    #sortBtn {
+      background-color: #f0ad4e;
+      color: #fff;
+    }
+    #sortBtn:hover {
+      background-color: #d4953b;
+    }
+    #showBtn {
+      background-color: #5d8a66;
+      color: #fff;
+    }
+    #showBtn:hover {
+      background-color: #4a7152;
+    }
+    #backBtn {
+      color: #8b4513;
+    }
+
+    /* ---------- ROSTER OUTPUT ---------- */
+    #roster { white-space: pre-wrap; margin-top: .75rem; }
+  </style>
+</head>
+
+<body>
+  <div class="container-card">
+    <h2>Enrollment & Roster</h2>
+    <p class="text-muted">Built-in HTML validation must pass before adding.</p>
+
+    <!-- ---------- FORM ---------- -->
+    <form id="enrollForm" novalidate>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label small" for="studentName">Student Name</label>
+          <input id="studentName" type="text" class="form-control" required autofocus />
+          <div id="nameError" class="error-text"></div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label small" for="studentId">Student ID</label>
+          <input id="studentId" type="number" class="form-control" required min="10000000" max="99999999" />
+          <div id="idError" class="error-text"></div>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label small" for="club">Club</label>
+          <select id="club" class="form-select">
+            <option>Chess</option>
+            <option>Robotics</option>
+            <option>Drama</option>
+            <option>Music</option>
+            <option>Art</option>
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label small" for="day">Meeting Day</label>
+          <select id="day" class="form-select">
+            <option>Mon</option>
+            <option>Tue</option>
+            <option>Wed</option>
+            <option>Thu</option>
+            <option>Fri</option>
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label small" for="time">Meeting Time</label>
+          <input id="time" type="time" class="form-control" required />
+          <div id="timeError" class="error-text"></div>
+        </div>
+      </div>
+    </form>
+
+    <!-- ---------- BUTTONS ---------- -->
+    <div class="actions mt-3">
+      <button id="addBtn" class="btn">Add Member</button>
+      <button id="undoBtn" class="btn">Undo Last</button>
+      <button id="frontBtn" class="btn">Add to Front</button>
+      <button id="removeFirstBtn" class="btn">Remove First</button>
+      <button id="sortBtn" class="btn">Sort Roster</button>
+      <button id="showBtn" class="btn">Show Roster</button>
+      <button id="backBtn" class="btn btn-link">Back to Landing</button>
+    </div>
+
+    <hr />
+
+    <!-- ---------- MESSAGES & ROSTER ---------- -->
+    <p id="msg" aria-live="polite"></p>
+    <p id="roster"></p>
+  </div>
+
+  <script>
+    // =============================== GLOBALS ===============================
+    const roster = []; // Main roster array
+
+    // Arrow function: formats one roster line
+    const formatMember = (m, i) => `#${i+1}: ${m.name} | ID:${m.id} | ${m.club} | ${m.day} @ ${m.time}`;
+
+    // Input & output elements
+    const nameEl = document.getElementById('studentName');
+    const idEl = document.getElementById('studentId');
+    const clubEl = document.getElementById('club');
+    const dayEl = document.getElementById('day');
+    const timeEl = document.getElementById('time');
+    const msgEl = document.getElementById('msg');
+    const rosterEl = document.getElementById('roster');
+    const formEl = document.getElementById('enrollForm');
+
+    // Error label elements (for inline validation)
+    const nameError = document.getElementById('nameError');
+    const idError = document.getElementById('idError');
+    const timeError = document.getElementById('timeError');
+
+    // =============================== CORE FUNCTIONS ===============================
+
+    // getSeed(): extracts last digit (L) of ID and first letter (F) of name
+    function getSeed() {
+      const idVal = idEl.value ? String(idEl.value) : '';
+      const nameVal = nameEl.value ? String(nameEl.value) : '';
+      const L = idVal ? parseInt(idVal.charAt(idVal.length - 1), 10) : null;
+      const F = nameVal ? nameVal.charAt(0).toUpperCase() : '';
+      return { L, F };
+    }
+
+    // canAdd(): determines if member can join based on Day Permit Rule
+    function canAdd(day, L) {
+      if (L === null || isNaN(L)) return false;
+      const isEven = (L % 2 === 0);
+      return isEven
+        ? (day === 'Mon' || day === 'Wed' || day === 'Fri')
+        : (day === 'Tue' || day === 'Thu');
+    }
+
+    // sortRoster(): sorts based on vowel/consonant rule
+    function sortRoster(mode) {
+      if (mode === 'Day-Time-Name') {
+        const order = { Mon:1, Tue:2, Wed:3, Thu:4, Fri:5 };
+        roster.sort((a,b)=>{
+          if (order[a.day] !== order[b.day]) return order[a.day]-order[b.day];
+          if (a.time !== b.time) return a.time.localeCompare(b.time);
+          return a.name.localeCompare(b.name);
+        });
+      } else {
+        roster.sort((a,b)=>{
+          if (a.club !== b.club) return a.club.localeCompare(b.club);
+          return Number(a.id) - Number(b.id);
+        });
+      }
+    }
+
+    // render(): displays roster summary and all entries
+    function render() {
+      rosterEl.innerHTML = '';
+      const seed = getSeed();
+      const permit = (seed.L !== null && seed.L % 2 === 0) ? 'MWF' : 'TuTh';
+      const mode = (seed.F && 'AEIOU'.includes(seed.F)) ? 'Day-Time-Name' : 'Club-Id';
+      const header = `Count:${roster.length} | SortMode:${mode} | Permit:${permit}`;
+      const lines = roster.map((m,i)=>formatMember(m,i));
+      rosterEl.innerHTML = [header, ...lines].join('<br>');
+    }
+
+    // showMsg(): displays a global success/error banner
+    function showMsg(text, isOk) {
+      msgEl.className = isOk ? 'ok' : 'err';
+      msgEl.textContent = text;
+    }
+
+    // clearInputs(): resets fields
+    function clearInputs() {
+      nameEl.value = '';
+      idEl.value = '';
+      clubEl.selectedIndex = 0;
+      dayEl.selectedIndex = 0;
+      timeEl.value = '';
+      nameEl.focus();
+    }
+
+    // =============================== VALIDATION HELPERS ===============================
+
+    // Clears all inline validation messages
+    function clearValidationErrors() {
+      nameError.textContent = '';
+      idError.textContent = '';
+      timeError.textContent = '';
+    }
+
+    // Checks each required field and shows small inline error if invalid
+    function showValidationErrors() {
+      clearValidationErrors();
+      let hasError = false;
+
+      if (!nameEl.value.trim()) {
+        nameError.textContent = 'Name is required.';
+        hasError = true;
+      }
+
+      if (!idEl.value) {
+        idError.textContent = 'Student ID is required.';
+        hasError = true;
+      } else if (idEl.value < 10000000 || idEl.value > 99999999) {
+        idError.textContent = 'Student ID must be 8 digits.';
+        hasError = true;
+      }
+
+      if (!timeEl.value) {
+        timeError.textContent = 'Meeting time is required.';
+        hasError = true;
+      }
+
+      return !hasError;
+    }
+
+    // =============================== EVENT HANDLERS ===============================
+
+    // Handles adding (push or unshift)
+    function handleAdd(toFront=false) {
+      clearValidationErrors();
+
+      // Validate via HTML attributes + JS feedback
+      if (!showValidationErrors()) {
+        showMsg('', false);
+        return;
+      }
+
+      const { L, F } = getSeed();
+      const member = {
+        name: nameEl.value.trim(),
+        id: Number(idEl.value),
+        club: clubEl.value,
+        day: dayEl.value,
+        time: timeEl.value
+      };
+
+      // Day permit enforcement
+      if (!canAdd(member.day, L)) {
+        const permit = (L % 2 === 0) ? 'MWF' : 'TuTh';
+        showMsg(`Not permitted: last digit ${L} → Permit:${permit}. Cannot add ${member.day}.`, false);
+        return;
+      }
+
+      // Prevent duplicates (same ID & club)
+      if (roster.some(m=>m.id===member.id && m.club===member.club)) {
+        showMsg(`Already enrolled: ID:${member.id} in ${member.club}.`, false);
+        return;
+      }
+
+      // Add to array
+      toFront ? roster.unshift(member) : roster.push(member);
+
+      showMsg(`Added: ${member.name} | ID:${member.id} | ${member.club}`, true);
+      clearInputs();
+      render();
+    }
+
+    // ---------- BUTTON EVENT LISTENERS ----------
+    document.getElementById('addBtn').addEventListener('click', e=>{
+      e.preventDefault();
+      handleAdd(false);
+    });
+
+    document.getElementById('frontBtn').addEventListener('click', e=>{
+      e.preventDefault();
+      handleAdd(true);
+    });
+
+    document.getElementById('undoBtn').addEventListener('click', e=>{
+      e.preventDefault();
+      if (roster.length===0) return showMsg('Roster is empty — nothing to undo.', false);
+      const removed = roster.pop();
+      showMsg(`Removed last: ${removed.name} | ID:${removed.id}`, true);
+      render();
+    });
+
+    document.getElementById('removeFirstBtn').addEventListener('click', e=>{
+      e.preventDefault();
+      if (roster.length===0) return showMsg('Roster is empty — nothing to remove.', false);
+      const removed = roster.shift();
+      showMsg(`Removed first: ${removed.name} | ID:${removed.id}`, true);
+      render();
+    });
+
+    document.getElementById('sortBtn').addEventListener('click', e=>{
+      e.preventDefault();
+      const { F } = getSeed();
+      const mode = (F && 'AEIOU'.includes(F)) ? 'Day-Time-Name' : 'Club-Id';
+      sortRoster(mode);
+      showMsg(`Roster sorted: ${mode}`, true);
+      render();
+    });
+
+    document.getElementById('showBtn').addEventListener('click', e=>{
+      e.preventDefault();
+      render();
+      showMsg('Roster displayed.', true);
+    });
+
+    document.getElementById('backBtn').addEventListener('click', e=>{
+      e.preventDefault();
+      window.location.href = 'index.html';
+    });
+
+    // Initial render
+    render();
+  </script>
+</body>
+</html>

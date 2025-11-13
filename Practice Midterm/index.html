@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Two-Page Club Roster</title>
+  <!-- Bootstrap CSS (CDN allowed) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { padding-top: 4rem; }
+    .hero { max-width: 800px; margin: 0 auto; text-align: center; }
+    .btn-start { font-size: 1.1rem; padding: .75rem 1.25rem; }
+  </style>
+</head>
+<body class="bg-light">
+  <main class="container">
+    <section class="hero card shadow-sm p-4">
+      <h1 class="mb-3">Two-Page Club Roster</h1>
+      <p class="lead">
+        Collect club sign-ups and display a dynamic roster on a second page.
+        Uses only vanilla HTML/CSS/JS with built-in validation and basic array methods.
+      </p>
+      <p>
+        Click Start to go to the enrollment page and begin adding members.
+      </p>
+      <button id="startBtn" class="btn btn-primary btn-start">Start</button>
+    </section>
+  </main>
+
+  <script>
+    // Only document.getElementById used on this page.
+    document.getElementById('startBtn').addEventListener('click', function () {
+      // open enroll.html in same tab
+      window.location.href = 'enroll.html';
+    });
+  </script>
+</body>
+</html>

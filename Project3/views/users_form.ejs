@@ -1,0 +1,89 @@
+<%- include("layout", { body: `
+<h2>${user.User_ID ? 'Edit User' : 'Add User'}</h2>
+<form action="${action}" method="POST" class="card p-4 shadow-sm">
+  <div class="row">
+    <div class="col-md-6">
+      <label>First Name</label>
+      <input class="form-control" name="First_name" value="${user.First_name || ''}" required>
+    </div>
+    <div class="col-md-6">
+      <label>Last Name</label>
+      <input class="form-control" name="Last_name" value="${user.Last_name || ''}" required>
+    </div>
+  </div>
+  <div class="row mt-2">
+    <div class="col-md-6">
+      <label>Username</label>
+      <input class="form-control" name="Username" value="${user.Username || ''}" required>
+    </div>
+    <div class="col-md-6">
+      <label>Password</label>
+      <input class="form-control" name="Password" value="${user.Password || ''}" required>
+    </div>
+  </div>
+
+  <div class="row mt-2">
+    <div class="col-md-6">
+      <label>Phone</label>
+      <input class="form-control" name="Phone_number" value="${user.Phone_number || ''}">
+    </div>
+    <div class="col-md-6">
+      <label>Birthday</label>
+      <input type="date" class="form-control" name="Birthday" value="${user.Birthday || ''}">
+    </div>
+  </div>
+
+  <div class="mt-3">
+    <label>Role</label>
+    <select id="role" name="role" class="form-select">
+      <option value="">Select Role</option>
+      <option value="Judge">Judge</option>
+      <option value="Dancer">Dancer</option>
+      <option value="Organizer">Organizer</option>
+    </select>
+  </div>
+
+  <div id="role-fields" class="mt-3"></div>
+
+  <button class="btn btn-primary mt-3">Save</button>
+</form>
+
+<script>
+  document.getElementById("role").addEventListener("change", function() {
+    const role = this.value;
+    const container = document.getElementById("role-fields");
+    container.innerHTML = "";
+    if (role === "Judge") {
+      container.innerHTML = `
+        <div class="mt-3">
+          <label>Highest to Judge</label>
+          <input class="form-control" name="Highest_to_judge">
+        </div>
+        <div class="form-check mt-2">
+          <input class="form-check-input" type="checkbox" name="ISTD_certified">
+          <label class="form-check-label">ISTD Certified</label>
+        </div>`;
+    } else if (role === "Dancer") {
+      container.innerHTML = `
+        <div class="mt-3">
+          <label>NDCA Number</label>
+          <input class="form-control" name="NDCA_number">
+        </div>
+        <div class="mt-2">
+          <label>NDCA Expiration</label>
+          <input type="date" class="form-control" name="NDCA_expiration">
+        </div>
+        <div class="mt-2">
+          <label>Type</label>
+          <input class="form-control" name="Type">
+        </div>`;
+    } else if (role === "Organizer") {
+      container.innerHTML = `
+        <div class="form-check mt-3">
+          <input class="form-check-input" type="checkbox" name="Recognized">
+          <label class="form-check-label">Recognized Organizer</label>
+        </div>`;
+    }
+  });
+</script>
+` }) %>
