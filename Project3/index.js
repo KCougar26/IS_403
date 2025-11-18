@@ -31,7 +31,7 @@ app.use(
 // Global authentication middleware - runs on EVERY request 
 app.use((req, res, next) => {
     // Skip authentication for login routes 
-    if (req.path === '/' || req.path === '/login' || req.path === '/logout' || req.path === '/register') { 
+    if (req.path === '/' || req.path === '/login' || req.path === '/logout' || req.path === '/users/add') { 
         return next(); // Just process the request 
     } 
     if (req.session.isLoggedIn) { 
@@ -51,13 +51,13 @@ app.get("/", function (req, res) {
   }
 });
 
-app.get('/login', (req, res) => {
-  res.render('login', { error_message: '' });
-});
-
 app.get('/logout', (req, res) => {
   req.session.destroy()
   res.redirect('/login');
+});
+
+app.get('/login', (req, res) => {
+  res.render('login', { error_message: '' });
 });
 
 app.post('/login', (req, res) => {
@@ -82,51 +82,6 @@ app.post('/login', (req, res) => {
     });
 });
 
-app.get('/register', (req, res) => {
-  res.render('register', { error_message: '' });
-});
-
-app.post('/register', (req, res) => {
-  const first_name = req.body.first_name;
-  const last_name = req.body.last_name;
-  const username = req.body.username;
-  const password = req.body.password;
-  const confirmPassword = req.body.confirmPassword;
-  const phone = req.body.phone;
-  const birthday = req.body.birthday;
-
-  if (password !== confirmPassword) {
-    return res.render('register', { error_message: 'Passwords do not match.' });
-  }
-
-  knex('User')
-    .where({ username })
-    .first()
-    .then(existing => {
-      if (existing) {
-        return res.render('register', { error_message: 'Username already exists.' });
-      }
-
-      return knex('User')
-        .insert({
-          first_name: first_name,
-          last_name: last_name,
-          username: username,
-          password: password,
-          phone_number: phone,
-          birthday: birthday
-        })
-        .then(() => {
-          console.log('User registered successfully');
-          res.redirect('/login');
-        });
-    })
-    .catch(err => {
-      console.error('Registration error:', err);
-      res.render('register', { error_message: 'Registration failed.' });
-    });
-});
-
 // --------------------- USERS CRUD ---------------------
 
 app.get("/users", function (req, res) {
@@ -146,37 +101,37 @@ app.get("/users/add", function (req, res) {
 
 app.post("/users/add", function (req, res) {
   const userData = {
-    First_name: req.body.First_name,
-    Last_name: req.body.Last_name,
-    Username: req.body.Username,
-    Password: req.body.Password,
-    Phone_number: req.body.Phone_number,
-    Birthday: req.body.Birthday
+    first_name: req.body.first_name,
+    last_name: req.body.last_name,
+    username: req.body.username,
+    password: req.body.password,
+    phone_number: req.body.phone_number,
+    birthday: req.body.birthday
   };
 
   knex("User").insert(userData)
-    .returning("User_ID")
+    .returning("user_id")
     .then(function(ids) {
-      const userId = ids[0];
+      const userid = ids[0];
       const role = req.body.role;
 
       if (role === "Judge") {
         return knex("judge").insert({
-          User_ID: userId,
-          Highest_to_judge: req.body.Highest_to_judge,
-          ISTD_certified: req.body.ISTD_certified === "on"
+          user_id: userid,
+          highest_to_judge: req.body.highest_to_judge,
+          istd_certified: req.body.istd_certified === "on"
         });
       } else if (role === "Dancer") {
         return knex("dancer").insert({
-          User_ID: userId,
-          NDCA_number: req.body.NDCA_number,
-          NDCA_expiration: req.body.NDCA_expiration,
-          Type: req.body.Type
+          user_id: userid,
+          ndca_number: req.body.ndca_number,
+          ndca_expiration: req.body.ndca_expiration,
+          type: req.body.type
         });
       } else if (role === "Organizer") {
         return knex("organizer").insert({
-          User_ID: userId,
-          Recognized: req.body.Recognized === "on"
+          user_id: userid,
+          recognized: req.body.recognized === "on"
         });
       }
     })
@@ -201,12 +156,12 @@ app.post("/users/edit/:id", function (req, res) {
   const id = req.params.id;
   knex("User").where("User_ID", id)
     .update({
-      First_name: req.body.First_name,
-      Last_name: req.body.Last_name,
-      Username: req.body.Username,
-      Password: req.body.Password,
-      Phone_number: req.body.Phone_number,
-      Birthday: req.body.Birthday
+      first_name: req.body.first_name,
+      last_name: req.body.last_name,
+      username: req.body.username,
+      password: req.body.password,
+      phone_number: req.body.phone_number,
+      birthday: req.body.birthday
     })
     .then(function() {
       res.redirect("/users");
