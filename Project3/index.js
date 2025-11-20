@@ -64,17 +64,42 @@ app.post('/login', (req, res) => {
   const sName = req.body.username;
   const sPassword = req.body.password;
 
-  knex.select('*')
-    .from('User')
+  knex("User")
     .where({ username: sName, password: sPassword })
     .then(users => {
-      if (users.length > 0) {
-        req.session.isLoggedIn = true;
-        req.session.username = sName;
-        res.redirect('/');
-      } else {
-        res.render('login', { error_message: 'Invalid username or password' });
+      if (users.length === 0) {
+        return res.render('login', { error_message: 'Invalid username or password' });
       }
+
+      const user = users[0];
+
+      // Create the session user object now
+      req.session.user = {
+        user_id: user.user_id,
+        username: user.username,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        isDancer: false,
+        isJudge: false,
+        isOrganizer: false
+      };
+
+      // Run all role checks (return promises so we can wait for them)
+      const dancerQuery = knex("dancer").where({ user_id: user.user_id });
+      const judgeQuery = knex("judge").where({ user_id: user.user_id });
+      const organizerQuery = knex("organizer").where({ user_id: user.user_id });
+
+      return Promise.all([dancerQuery, judgeQuery, organizerQuery]);
+    })
+    .then(([dancers, judges, organizers]) => {
+      // Set the roles after queries resolve
+      req.session.user.isDancer = dancers.length > 0;
+      req.session.user.isJudge = judges.length > 0;
+      req.session.user.isOrganizer = organizers.length > 0;
+
+      req.session.isLoggedIn = true;
+
+      res.redirect('/', { user: req.session.user });
     })
     .catch(err => {
       console.error('Login error:', err);
@@ -87,7 +112,7 @@ app.post('/login', (req, res) => {
 app.get("/users", function (req, res) {
   knex.select().from("User")
     .then(function(users) {
-      res.render("displayUsers", { users: users });
+      res.render("displayUsers", { users: users , user: req.session.user});
     })
     .catch(function(err) {
       console.error(err);
@@ -100,26 +125,52 @@ app.get("/users/add", function (req, res) {
 });
 
 app.post("/users/add", function (req, res) {
-  const userData = {
-    first_name: req.body.first_name,
-    last_name: req.body.last_name,
-    username: req.body.username,
-    password: req.body.password,
-    phone_number: req.body.phone_number,
-    birthday: req.body.birthday
-  };
-
-  knex("User").insert(userData)
-    .returning("user_id")
-    .then(function(ids) {
-      const userid = ids[0];
-      const role = req.body.role;
-
+  const role = req.body.role;
+  const addcode = req.body.add_code;
+  // 1. VALIDATE ADD CODE FOR JUDGE & ORGANIZER
+  let addCodeCheck = Promise.resolve();
+  if (role === "Judge" || role === "Organizer") {
+    addCodeCheck = knex("addcodes")
+      .where("code", addcode)
+      .first() // Make sure we only get one row
+      .then(function (validCode) {
+        if (!validCode) {
+          // Add code is invalid
+          throw new Error("INVALID_ADD_CODE");
+        }
+      });
+  }
+  addCodeCheck
+    .then(function () {
+      // 2. CHECK USERNAME UNIQUENESS
+      return knex("User")
+        .where("username", req.body.username)
+        .first()
+        .then(function (existingUser) {
+          if (existingUser) {
+            throw new Error("USERNAME_TAKEN");
+          }
+          // Username is free, continue
+          const userData = {
+            first_name: req.body.first_name,
+            last_name: req.body.last_name,
+            username: req.body.username,
+            password: req.body.password,
+            phone_number: req.body.phone_number,
+            birthday: req.body.birthday,
+          };
+          return knex("User").insert(userData).returning("user_id");
+        });
+    })
+    .then(function (ids) {
+      const userid = ids[0].user_id;
+      // 3. INSERT ROLE-SPECIFIC RECORD
       if (role === "Judge") {
         return knex("judge").insert({
           user_id: userid,
-          highest_to_judge: req.body.highest_to_judge,
-          istd_certified: req.body.istd_certified === "on"
+          highest_to_judge: "", // removed requirement
+          istd_certified: req.body.istd_certified === "on",
+          addcodeused: addcode
         });
       } else if (role === "Dancer") {
         return knex("dancer").insert({
@@ -131,35 +182,53 @@ app.post("/users/add", function (req, res) {
       } else if (role === "Organizer") {
         return knex("organizer").insert({
           user_id: userid,
-          recognized: req.body.recognized === "on"
+          recognized: req.body.recognized === "on",
+          addcodeused: addcode
         });
       }
     })
-    .then(function() {
-      res.redirect("/users");
+    .then(function () {
+      res.redirect("/");
     })
-    .catch(function(err) {
-      console.error(err);
-      res.send("Error adding user");
+    .catch(function (err) {
+      // 5. ERROR HANDLING
+      if (err.message === "INVALID_ADD_CODE") {
+        res.render("users_form", {
+          error: "Invalid add code.",
+          user: req.body,
+          action: "/users/add"
+        });
+      } else if (err.message === "USERNAME_TAKEN") {
+        res.render("users_form", {
+          error: "Username already exists.",
+          user: req.body,
+          action: "/users/add"
+        });
+      } else {
+        console.error(err);
+        res.render("users_form", {
+          error: "Error adding user.",
+          user: req.body,
+          action: "/users/add"
+        });
+      }
     });
 });
 
 app.get("/users/edit/:id", function (req, res) {
   const id = req.params.id;
-  knex("User").where("User_ID", id).first()
+  knex("User").where("user_id", id).first()
     .then(function(user) {
-      res.render("users_form", { user: user, action: "/users/edit/" + id });
+      res.render("users_edit", { user: user, action: "/users/edit/" + id });
     });
 });
 
 app.post("/users/edit/:id", function (req, res) {
   const id = req.params.id;
-  knex("User").where("User_ID", id)
+  knex("User").where("user_id", id)
     .update({
       first_name: req.body.first_name,
       last_name: req.body.last_name,
-      username: req.body.username,
-      password: req.body.password,
       phone_number: req.body.phone_number,
       birthday: req.body.birthday
     })
@@ -169,7 +238,7 @@ app.post("/users/edit/:id", function (req, res) {
 });
 
 app.get("/users/delete/:id", function (req, res) {
-  knex("User").where("User_ID", req.params.id).del()
+  knex("User").where("user_id", req.params.id).del()
     .then(function() {
       res.redirect("/users");
     });
@@ -181,7 +250,7 @@ app.get("/users/delete/:id", function (req, res) {
 app.get("/competitions", function (req, res) {
   knex.select().from("competition")
     .then(function(competitions) {
-      res.render("competitions_list", { competitions: competitions });
+      res.render("competitions_list", { competitions: competitions , user: req.session.user});
     });
 });
 
@@ -201,14 +270,14 @@ app.post("/competitions/add", function (req, res) {
 });
 
 app.get("/competitions/edit/:id", function (req, res) {
-  knex("competition").where("Competition_ID", req.params.id).first()
+  knex("competition").where("competition_id", req.params.id).first()
     .then(function(competition) {
       res.render("competitions_form", { competition: competition, action: "/competitions/edit/" + req.params.id });
     });
 });
 
 app.post("/competitions/edit/:id", function (req, res) {
-  knex("competition").where("Competition_ID", req.params.id)
+  knex("competition").where("competition_id", req.params.id)
     .update({
       Organizer_ID: req.body.Organizer_ID || null,
       Location: req.body.Location,
@@ -220,19 +289,18 @@ app.post("/competitions/edit/:id", function (req, res) {
 });
 
 app.get("/competitions/delete/:id", function (req, res) {
-  knex("competition").where("Competition_ID", req.params.id).del()
+  knex("competition").where("competition_id", req.params.id).del()
     .then(function() {
       res.redirect("/competitions");
     });
 });
-
 
 // --------------------- EVENTS CRUD ---------------------
 
 app.get("/events", function (req, res) {
   knex.select().from("event")
     .then(function(events) {
-      res.render("events_list", { events: events });
+      res.render("events_list", { events: events, user: req.session.user});
     });
 });
 
@@ -254,14 +322,14 @@ app.post("/events/add", function (req, res) {
 });
 
 app.get("/events/edit/:id", function (req, res) {
-  knex("event").where("Event_ID", req.params.id).first()
+  knex("event").where("event_id", req.params.id).first()
     .then(function(event) {
       res.render("events_form", { event: event, action: "/events/edit/" + req.params.id });
     });
 });
 
 app.post("/events/edit/:id", function (req, res) {
-  knex("event").where("Event_ID", req.params.id)
+  knex("event").where("event_id", req.params.id)
     .update({
       Competition_ID: req.body.Competition_ID || null,
       Title: req.body.Title,
@@ -275,7 +343,7 @@ app.post("/events/edit/:id", function (req, res) {
 });
 
 app.get("/events/delete/:id", function (req, res) {
-  knex("event").where("Event_ID", req.params.id).del()
+  knex("event").where("event_id", req.params.id).del()
     .then(function() {
       res.redirect("/events");
     });

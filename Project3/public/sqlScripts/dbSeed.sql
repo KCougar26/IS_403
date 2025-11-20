@@ -6,10 +6,10 @@ VALUES
 ('David', 'Lee', 'davidl', 'passw0rd', '555-777-8888', '1988-03-10'),
 ('Allen', 'Schultz', 'a', 'a', '555-999-0000', '1980-01-01');
 
-INSERT INTO Organizer (User_ID, Recognized)
+INSERT INTO Organizer (User_ID, Recognized, addcodeused)
 VALUES
-(1, TRUE),   -- Alice (User_ID = 1)
-(2, FALSE);  -- Bob (User_ID = 2)
+(1, TRUE,'ORG-9F3KD2'),   -- Alice (User_ID = 1)
+(2, FALSE, 'ORG-PQ8ZL1');  -- Bob (User_ID = 2)
 
 INSERT INTO Judge (User_ID, Highest_to_judge, ISTD_certified, addcodeused)
 VALUES
