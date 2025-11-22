@@ -141,7 +141,7 @@ app.post("/searchPokemon", (req, res) => {
     });
 });
 
-// ---- User List Route ----
+// ---- User List Routes ----
 app.get("/user_list", (req, res) => {
   db("users")
     .select("*")

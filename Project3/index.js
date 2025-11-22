@@ -99,7 +99,7 @@ app.post('/login', (req, res) => {
 
       req.session.isLoggedIn = true;
 
-      res.redirect('/', { user: req.session.user });
+      res.redirect('/');
     })
     .catch(err => {
       console.error('Login error:', err);
