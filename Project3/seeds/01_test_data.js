@@ -3,183 +3,183 @@
  */
 exports.seed = async function (knex) {
   // Clear all
-  await knex("Dancer_Registration").del();
-  await knex("Judge_Registration").del();
-  await knex("Event").del();
-  await knex("AddCodes").del();
-  await knex("Competition").del();
-  await knex("Admins").del();
-  await knex("Dancer").del();
-  await knex("Judge").del();
-  await knex("Organizer").del();
-  await knex("User").del();
+  await knex("dancer_registration").del();
+  await knex("judge_registration").del();
+  await knex("event").del();
+  await knex("addcodes").del();
+  await knex("competition").del();
+  await knex("admins").del();
+  await knex("dancer").del();
+  await knex("judge").del();
+  await knex("organizer").del();
+  await knex("user").del();
 
-  // USER
-  const users = await knex("User").insert(
+  // user
+  const users = await knex("user").insert(
     [
       {
-        First_name: "Alice",
-        Last_name: "Johnson",
-        Username: "alicej",
-        Password: "password123",
-        Phone_number: "555-111-2222",
-        Birthday: "1990-05-15",
+        first_name: "Alice",
+        last_name: "Johnson",
+        username: "alicej",
+        password: "password123",
+        phone_number: "555-111-2222",
+        birthday: "1990-05-15",
       },
       {
-        First_name: "Bob",
-        Last_name: "Smith",
-        Username: "bobsmith",
-        Password: "securepass",
-        Phone_number: "555-333-4444",
-        Birthday: "1985-08-20",
+        first_name: "Bob",
+        last_name: "Smith",
+        username: "bobsmith",
+        password: "securepass",
+        phone_number: "555-333-4444",
+        birthday: "1985-08-20",
       },
       {
-        First_name: "Carol",
-        Last_name: "Davis",
-        Username: "carold",
-        Password: "mypassword",
-        Phone_number: "555-555-6666",
-        Birthday: "1992-12-01",
+        first_name: "Carol",
+        last_name: "Davis",
+        username: "carold",
+        password: "mypassword",
+        phone_number: "555-555-6666",
+        birthday: "1992-12-01",
       },
       {
-        First_name: "David",
-        Last_name: "Lee",
-        Username: "davidl",
-        Password: "passw0rd",
-        Phone_number: "555-777-8888",
-        Birthday: "1988-03-10",
+        first_name: "David",
+        last_name: "Lee",
+        username: "davidl",
+        password: "passw0rd",
+        phone_number: "555-777-8888",
+        birthday: "1988-03-10",
       },
       {
-        First_name: "Allen",
-        Last_name: "Schultz",
-        Username: "a",
-        Password: "a",
-        Phone_number: "555-999-0000",
-        Birthday: "1980-01-01",
+        first_name: "Allen",
+        last_name: "Schultz",
+        username: "a",
+        password: "a",
+        phone_number: "555-999-0000",
+        birthday: "1980-01-01",
       },
     ],
-    ["User_ID"]
+    ["user_id"]
   );
 
-  // ORGANIZER
-  await knex("Organizer").insert([
-    { User_ID: users[0].User_ID, Recognized: true, addcodeused: "ORG-9F3KD2" },
-    { User_ID: users[1].User_ID, Recognized: false, addcodeused: "ORG-PQ8ZL1" },
+  // organizer
+  await knex("organizer").insert([
+    { user_id: users[0].user_id, recognized: true, addcodeused: "ORG-9F3KD2" },
+    { user_id: users[1].user_id, recognized: false, addcodeused: "ORG-PQ8ZL1" },
   ]);
 
-  // JUDGE
-  await knex("Judge").insert([
+  // judge
+  await knex("judge").insert([
     {
-      User_ID: users[2].User_ID,
-      Highest_to_judge: "Professional",
-      ISTD_certified: true,
+      user_id: users[2].user_id,
+      highest_to_judge: "Professional",
+      istd_certified: true,
       addcodeused: "JDG-AB12CD",
     },
     {
-      User_ID: users[3].User_ID,
-      Highest_to_judge: "Amateur",
-      ISTD_certified: false,
+      user_id: users[3].user_id,
+      highest_to_judge: "Amateur",
+      istd_certified: false,
       addcodeused: "JDG-X91PLT",
     },
   ]);
 
-  // DANCER
-  await knex("Dancer").insert([
+  // dancer
+  await knex("dancer").insert([
     {
-      User_ID: users[0].User_ID,
-      NDCA_number: 12345,
-      NDCA_expiration: "2026-05-15",
-      Type: "Lead",
+      user_id: users[0].user_id,
+      ndca_number: 12345,
+      ndca_expiration: "2026-05-15",
+      type: "Lead",
     },
     {
-      User_ID: users[1].User_ID,
-      NDCA_number: 67890,
-      NDCA_expiration: "2026-08-20",
-      Type: "Follow",
+      user_id: users[1].user_id,
+      ndca_number: 67890,
+      ndca_expiration: "2026-08-20",
+      type: "Follow",
     },
     {
-      User_ID: users[2].User_ID,
-      NDCA_number: 54321,
-      NDCA_expiration: "2026-12-01",
-      Type: "Lead",
+      user_id: users[2].user_id,
+      ndca_number: 54321,
+      ndca_expiration: "2026-12-01",
+      type: "Lead",
     },
   ]);
 
-  // ADMIN
-  await knex("Admins").insert([{ User_ID: users[4].User_ID }]);
+  // admin
+  await knex("admins").insert([{ user_id: users[4].user_id }]);
 
-  // COMPETITION
-  const comps = await knex("Competition").insert(
+  // competition
+  const comps = await knex("competition").insert(
     [
-      { Organizer_ID: 1, Location: "New York City Ballroom", Sanctioned: true },
-      { Organizer_ID: 2, Location: "Los Angeles Dance Hall", Sanctioned: false },
+      { organizer_id: 1, location: "New York City Ballroom", sanctioned: true },
+      { organizer_id: 2, location: "Los Angeles Dance Hall", sanctioned: false },
     ],
-    ["Competition_ID"]
+    ["competition_id"]
   );
 
-  // ADDCODES
-  await knex("AddCodes").insert([
-    { Competition_ID: null, Code: "ORG-9F3KD2", CodeType: "Organizer" },
-    { Competition_ID: null, Code: "ORG-PQ8ZL1", CodeType: "Organizer" },
-    { Competition_ID: null, Code: "ORG-K27MHD", CodeType: "Organizer" },
-    { Competition_ID: comps[0].Competition_ID, Code: "JDG-AB12CD", CodeType: "Judge" },
-    { Competition_ID: comps[1].Competition_ID, Code: "JDG-X91PLT", CodeType: "Judge" },
-    { Competition_ID: comps[1].Competition_ID, Code: "JDG-FF72QW", CodeType: "Judge" },
+  // addcodes
+  await knex("addcodes").insert([
+    { competition_id: null, code: "ORG-9F3KD2", codetype: "Organizer" },
+    { competition_id: null, code: "ORG-PQ8ZL1", codetype: "Organizer" },
+    { competition_id: null, code: "ORG-K27MHD", codetype: "Organizer" },
+    { competition_id: comps[0].competition_id, code: "JDG-AB12CD", codetype: "Judge" },
+    { competition_id: comps[1].competition_id, code: "JDG-X91PLT", codetype: "Judge" },
+    { competition_id: comps[1].competition_id, code: "JDG-FF72QW", codetype: "Judge" },
   ]);
 
-  // EVENTS
-  const events = await knex("Event").insert(
+  // events
+  const events = await knex("event").insert(
     [
       {
-        Competition_ID: comps[0].Competition_ID,
-        Title: "Waltz Championship",
-        Start_date_time: "2025-11-20 18:00:00",
-        End_date_time: "2025-11-20 21:00:00",
-        Rounds: 3,
+        competition_id: comps[0].competition_id,
+        title: "Waltz Championship",
+        start_date_time: "2025-11-20 18:00:00",
+        end_date_time: "2025-11-20 21:00:00",
+        rounds: 3,
       },
       {
-        Competition_ID: comps[0].Competition_ID,
-        Title: "Tango Showdown",
-        Start_date_time: "2025-11-21 19:00:00",
-        End_date_time: "2025-11-21 22:00:00",
-        Rounds: 4,
+        competition_id: comps[0].competition_id,
+        title: "Tango Showdown",
+        start_date_time: "2025-11-21 19:00:00",
+        end_date_time: "2025-11-21 22:00:00",
+        rounds: 4,
       },
       {
-        Competition_ID: comps[1].Competition_ID,
-        Title: "Foxtrot Classic",
-        Start_date_time: "2025-12-05 17:00:00",
-        End_date_time: "2025-12-05 20:00:00",
-        Rounds: 2,
+        competition_id: comps[1].competition_id,
+        title: "Foxtrot Classic",
+        start_date_time: "2025-12-05 17:00:00",
+        end_date_time: "2025-12-05 20:00:00",
+        rounds: 2,
       },
     ],
-    ["Event_ID"]
+    ["event_id"]
   );
 
-  // JUDGE REG
-  await knex("Judge_Registration").insert([
-    { Competition_ID: comps[0].Competition_ID, Judge_ID: 1 },
-    { Competition_ID: comps[1].Competition_ID, Judge_ID: 2 },
+  // judge reg
+  await knex("judge_registration").insert([
+    { competition_id: comps[0].competition_id, judge_id: 1 },
+    { competition_id: comps[1].competition_id, judge_id: 2 },
   ]);
 
-  // DANCER REG
-  await knex("Dancer_Registration").insert([
+  // dancer reg
+  await knex("dancer_registration").insert([
     {
-      Competition_ID: comps[0].Competition_ID,
-      Dancer_ID: 1,
-      Event_ID: 1,
-      Lead: true,
+      competition_id: comps[0].competition_id,
+      dancer_id: 1,
+      event_id: 1,
+      lead: true,
     },
     {
-      Competition_ID: comps[0].Competition_ID,
-      Dancer_ID: 2,
-      Event_ID: 1,
-      Lead: false,
+      competition_id: comps[0].competition_id,
+      dancer_id: 2,
+      event_id: 1,
+      lead: false,
     },
     {
-      Competition_ID: comps[0].Competition_ID,
-      Dancer_ID: 3,
-      Event_ID: 2,
-      Lead: true,
+      competition_id: comps[0].competition_id,
+      dancer_id: 3,
+      event_id: 2,
+      lead: true,
     },
   ]);
 };
