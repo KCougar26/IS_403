@@ -28,7 +28,7 @@ app.use((req, res, next) => {
         return next(); // Just process the request 
     } 
     if (req.session.isLoggedIn) { 
-        next(); // User is logged in, continue 
+        next(); // user is logged in, continue 
     } 
     else { 
         res.render("login", { error_message: "Please log in to access this page" }); 
@@ -57,7 +57,7 @@ app.post('/login', (req, res) => {
   const sName = req.body.username;
   const sPassword = req.body.password;
 
-  knex("User")
+  knex("user")
     .where({ username: sName, password: sPassword })
     .then(users => {
       if (users.length === 0) {
@@ -103,9 +103,9 @@ app.post('/login', (req, res) => {
 // --------------------- USERS CRUD ---------------------
 
 app.get("/users", function (req, res) {
-  knex.select().from("User")
+  knex.select().from("user")
     .then(function(users) {
-      res.render("displayUsers", { users: users , user: req.session.user});
+      res.render("displayusers", { users: users , user: req.session.user});
     })
     .catch(function(err) {
       console.error(err);
@@ -136,14 +136,14 @@ app.post("/users/add", function (req, res) {
   addCodeCheck
     .then(function () {
       // 2. CHECK USERNAME UNIQUENESS
-      return knex("User")
+      return knex("user")
         .where("username", req.body.username)
         .first()
-        .then(function (existingUser) {
-          if (existingUser) {
+        .then(function (existinguser) {
+          if (existinguser) {
             throw new Error("USERNAME_TAKEN");
           }
-          // Username is free, continue
+          // username is free, continue
           const userData = {
             first_name: req.body.first_name,
             last_name: req.body.last_name,
@@ -152,7 +152,7 @@ app.post("/users/add", function (req, res) {
             phone_number: req.body.phone_number,
             birthday: req.body.birthday,
           };
-          return knex("User").insert(userData).returning("user_id");
+          return knex("user").insert(userData).returning("user_id");
         });
     })
     .then(function (ids) {
@@ -193,7 +193,7 @@ app.post("/users/add", function (req, res) {
         });
       } else if (err.message === "USERNAME_TAKEN") {
         res.render("users_form", {
-          error: "Username already exists.",
+          error: "username already exists.",
           user: req.body,
           action: "/users/add"
         });
@@ -210,7 +210,7 @@ app.post("/users/add", function (req, res) {
 
 app.get("/users/edit/:id", function (req, res) {
   const id = req.params.id;
-  knex("User").where("user_id", id).first()
+  knex("user").where("user_id", id).first()
     .then(function(user) {
       res.render("users_edit", { user: user, action: "/users/edit/" + id });
     });
@@ -218,7 +218,7 @@ app.get("/users/edit/:id", function (req, res) {
 
 app.post("/users/edit/:id", function (req, res) {
   const id = req.params.id;
-  knex("User").where("user_id", id)
+  knex("user").where("user_id", id)
     .update({
       first_name: req.body.first_name,
       last_name: req.body.last_name,
@@ -231,7 +231,7 @@ app.post("/users/edit/:id", function (req, res) {
 });
 
 app.get("/users/delete/:id", function (req, res) {
-  knex("User").where("user_id", req.params.id).del()
+  knex("user").where("user_id", req.params.id).del()
     .then(function() {
       res.redirect("/users");
     });
