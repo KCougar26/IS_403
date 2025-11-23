@@ -253,9 +253,9 @@ app.get("/competitions/add", function (req, res) {
 
 app.post("/competitions/add", function (req, res) {
   knex("competition").insert({
-    Organizer_ID: req.body.Organizer_ID || null,
-    Location: req.body.Location,
-    Sanctioned: req.body.Sanctioned === "on"
+    organizer_id: req.body.organizer_id || null,
+    location: req.body.location,
+    sanctioned: req.body.sanctioned === "on"
   })
   .then(function() {
     res.redirect("/competitions");
@@ -272,9 +272,9 @@ app.get("/competitions/edit/:id", function (req, res) {
 app.post("/competitions/edit/:id", function (req, res) {
   knex("competition").where("competition_id", req.params.id)
     .update({
-      Organizer_ID: req.body.Organizer_ID || null,
-      Location: req.body.Location,
-      Sanctioned: req.body.Sanctioned === "on"
+      organizer_id: req.body.organizer_id || null,
+      location: req.body.location,
+      sanctioned: req.body.sanctioned === "on"
     })
     .then(function() {
       res.redirect("/competitions");
@@ -303,11 +303,11 @@ app.get("/events/add", function (req, res) {
 
 app.post("/events/add", function (req, res) {
   knex("event").insert({
-    Competition_ID: req.body.Competition_ID || null,
-    Title: req.body.Title,
-    Start_date_time: req.body.Start_date_time,
-    End_date_time: req.body.End_date_time,
-    Rounds: req.body.Rounds
+    competition_id: req.body.competition_id || null,
+    title: req.body.title,
+    start_date_time: req.body.start_date_time,
+    end_date_time: req.body.end_date_time,
+    rounds: req.body.rounds
   })
   .then(function() {
     res.redirect("/events");
@@ -324,11 +324,11 @@ app.get("/events/edit/:id", function (req, res) {
 app.post("/events/edit/:id", function (req, res) {
   knex("event").where("event_id", req.params.id)
     .update({
-      Competition_ID: req.body.Competition_ID || null,
-      Title: req.body.Title,
-      Start_date_time: req.body.Start_date_time,
-      End_date_time: req.body.End_date_time,
-      Rounds: req.body.Rounds
+      competition_id: req.body.competition_id || null,
+      title: req.body.title,
+      start_date_time: req.body.start_date_time,
+      end_date_time: req.body.end_date_time,
+      rounds: req.body.rounds
     })
     .then(function() {
       res.redirect("/events");
