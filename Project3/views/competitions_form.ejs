@@ -23,17 +23,17 @@
     <form action="<%= action %>" method="POST" class="card p-4 shadow-sm">
       <div class="mb-3">
         <label class="form-label">Organizer ID</label>
-        <input class="form-control" name="Organizer_ID" value="<%= competition.Organizer_ID || '' %>">
+        <input class="form-control" name="organizer_id" value="<%= competition.Organizer_ID || '' %>">
         <div class="form-text">Leave blank if not assigned yet.</div>
       </div>
 
       <div class="mb-3">
         <label class="form-label">Location</label>
-        <input class="form-control" name="Location" value="<%= competition.Location || '' %>" required>
+        <input class="form-control" name="location" value="<%= competition.Location || '' %>" required>
       </div>
 
       <div class="form-check mb-3">
-        <input class="form-check-input" type="checkbox" name="Sanctioned" <%= competition.Sanctioned ? 'checked' : '' %>>
+        <input class="form-check-input" type="checkbox" name="sanctioned" <%= competition.Sanctioned ? 'checked' : '' %>>
         <label class="form-check-label">Sanctioned Competition</label>
       </div>
 
