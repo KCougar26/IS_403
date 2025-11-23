@@ -105,7 +105,7 @@ app.post('/login', (req, res) => {
 app.get("/users", function (req, res) {
   knex.select().from("user")
     .then(function(users) {
-      res.render("displayusers", { users: users , user: req.session.user});
+      res.render("displayUsers", { users: users , user: req.session.user});
     })
     .catch(function(err) {
       console.error(err);
