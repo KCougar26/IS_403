@@ -5,10 +5,10 @@ const path = require("path");
 const knex = require("knex")({
   client: "pg",
   connection: {
-    host : process.env.RDS_HOST || "localhost",
-    user : process.env.RDS_USER || "bigal66",
+    host : process.env.RDS_HOSTNAME || "localhost",
+    user : process.env.RDS_USERNAME || "bigal66",
     password : process.env.RDS_PASSWORD || "killme66",
-    database : process.env.RDS_NAME || "ballroom",
+    database : process.env.RDS_DB_NAME || "ballroom",
     port : process.env.RDS_PORT || 5432,
     ssl: process.env.DB_SSL ? {rejectUnauthorized: false} : false
   }
