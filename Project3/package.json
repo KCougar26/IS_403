@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "postinstall": "knex migrate:latest && knex seed:run"
   },
   "dependencies": {
     "dotenv": "^17.2.3",
