@@ -342,6 +342,43 @@ app.get("/events/delete/:id", function (req, res) {
     });
 });
 
+// --------------------- DASHBOARD ROUTE ---------------------
+app.get("/dashboard", async (req, res) => {
+  // This route is automatically protected by the global middleware
+  const user = req.session.user;
+
+  try {
+    let dashboardData = {
+      user: user,
+      registeredCompetitions: [],
+      organizedCompetitions: []
+    };
+
+    // --- Logic for DANCERS ---
+    if (user.isDancer) {
+      dashboardData.registeredCompetitions = await knex("competition")
+        .join("dancer_registration", "competition.competition_id", "dancer_registration.competition_id")
+        .where("dancer_registration.user_id", user.user_id)
+        .select("competition.location", "competition.sanctioned", "competition.competition_id");
+    }
+
+    // --- Logic for ORGANIZERS ---
+    if (user.isOrganizer) {
+      // This assumes the 'competition' table has an 'organizer_id' column linked to user.user_id.
+      dashboardData.organizedCompetitions = await knex("competition")
+        .where("organizer_id", user.user_id)
+        .select("competition.*");
+    }
+
+    // Render the dashboard.ejs view
+    res.render("dashboard", dashboardData);
+  } catch (error) {
+    console.error('Error loading your competitions:', error);
+    res.status(500).send("Error loading your competitions.");
+  }
+});
+// -------------
+
 app.listen(port, function () {
   console.log("Server running on port " + port);
 });
