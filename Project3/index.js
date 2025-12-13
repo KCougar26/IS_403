@@ -344,7 +344,6 @@ app.get("/events/delete/:id", function (req, res) {
 
 // --------------------- DASHBOARD ROUTE ---------------------
 app.get("/dashboard", async (req, res) => {
-  // This route is automatically protected by the global middleware
   const user = req.session.user;
 
   try {
